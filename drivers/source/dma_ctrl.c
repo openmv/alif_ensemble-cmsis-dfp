@@ -94,6 +94,7 @@ void dma_copy_desc_info(dma_config_info_t *dma_cfg, uint8_t channel_num, dma_des
     channel_desc_info->total_len          = desc_info->total_len;
     channel_desc_info->src_addr           = desc_info->src_addr;
     channel_desc_info->dst_addr           = desc_info->dst_addr;
+    channel_desc_info->dst_addr1          = desc_info->dst_addr1;
     channel_desc_info->src_bsize          = desc_info->src_bsize;
     channel_desc_info->dst_bsize          = desc_info->dst_bsize;
     channel_desc_info->src_blen           = desc_info->src_blen;

@@ -228,6 +228,7 @@ static int32_t DMA_CopyDesc(uint8_t channel_num, ARM_DMA_PARAMS *params, DMA_RES
 
     dma_desc.periph_num = (uint8_t) params->peri_reqno;
     dma_desc.dst_addr   = LocalToGlobal(params->dst_addr);
+    dma_desc.dst_addr1  = 0;
     dma_desc.src_addr   = LocalToGlobal(params->src_addr);
     dma_desc.dst_blen   = params->burst_len;
     dma_desc.src_blen   = params->burst_len;
