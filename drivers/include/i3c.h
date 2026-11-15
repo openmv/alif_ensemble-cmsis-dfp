@@ -1403,6 +1403,24 @@ void i3c_master_tx_blocking(I3C_Type *i3c, i3c_xfer_t *xfer);
 void i3c_master_rx_blocking(I3C_Type *i3c, i3c_xfer_t *xfer);
 
 /**
+  \fn           void i3c_master_tx(I3C_Type *i3c, i3c_xfer_t *xfer)
+  \brief        Queue master data transmission, without waiting for completion.
+  \param[in]    i3c      : Pointer to i3c register set structure
+  \param[in]    xfer     : Pointer to i3c transfer structure
+  \return       none
+*/
+void i3c_master_tx(I3C_Type *i3c, i3c_xfer_t *xfer);
+
+/**
+  \fn           void i3c_master_rx(I3C_Type *i3c, i3c_xfer_t *xfer)
+  \brief        Queue master data reception, without waiting for completion.
+  \param[in]    i3c      : Pointer to i3c register set structure
+  \param[in]    xfer     : Pointer to i3c transfer structure
+  \return       none
+*/
+void i3c_master_rx(I3C_Type *i3c, i3c_xfer_t *xfer);
+
+/**
   \fn           void i3c_slave_tx_blocking(I3C_Type *i3c, i3c_xfer_t *xfer)
   \brief        Performs slave data transmission in blocking mode.
   \param[in]    i3c      : Pointer to i3c register set structure
