@@ -48,6 +48,7 @@ typedef struct _dma_desc_info_t {
     uint32_t         total_len;        /*!< Number of bytes                 */
     uint32_t         src_addr;         /*!< Source address                  */
     uint32_t         dst_addr;         /*!< Destination address             */
+    uint32_t         dst_addr1;        /*!< Second destination address      */
     uint8_t          src_bsize;        /*!< Src Burst Size                  */
     uint8_t          dst_bsize;        /*!< Dest Burst Size                 */
     uint8_t          src_blen;         /*!< Src Burst length                */

@@ -22,6 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include <dma_op.h>
 #include <stdbool.h>
+#include <string.h>
 
 /**
   \fn          bool dma_generate_opcode(dma_config_info_t *dma_cfg,
@@ -66,6 +67,9 @@ bool dma_generate_opcode(dma_config_info_t *dma_cfg, uint8_t channel_num)
     if (!ret) {
         return ret;
     }
+
+    /* For double buffering. */
+    uint32_t op_buf_start = op_buf.off;
 
     burst       = (1 << desc->dst_bsize) * desc->dst_blen;
     total_bytes = desc->total_len;
@@ -313,12 +317,51 @@ bool dma_generate_opcode(dma_config_info_t *dma_cfg, uint8_t channel_num)
         return ret;
     }
 
-    ret = dma_construct_send_event(channel_info->event_index, &op_buf);
-    if (!ret) {
-        return ret;
+    if (desc->dst_addr1 == 0) {
+        ret = dma_construct_send_event(channel_info->event_index, &op_buf);
+        if (!ret) {
+            return ret;
+        }
+
+        ret = dma_construct_end(&op_buf);
+    } else {
+        /* The size of the transfer loops microcode. */
+        uint32_t op_buf_size = op_buf.off - op_buf_start;
+
+        /* Move dst_addr1 to DAR. */
+        if (!dma_construct_move(desc->dst_addr1, DMA_REG_DAR, &op_buf)) {
+            return false;
+        }
+
+        /* Notify that DAR was switched. */
+        if (!dma_construct_send_event(channel_info->event_index, &op_buf)) {
+            return false;
+        }
+
+        /* Make sure there's enough space in the buffer. */
+        if ((op_buf.off + op_buf_size) > DMA_MICROCODE_SIZE) {
+            return false;
+        }
+
+        /* Copy the transfer microcode. */
+        memcpy(&op_buf.buf[op_buf.off], &op_buf.buf[op_buf_start], op_buf_size);
+        op_buf.off += op_buf_size;
+
+        /* Move dst_addr to DAR. */
+        if (!dma_construct_move(desc->dst_addr, DMA_REG_DAR, &op_buf)) {
+            return false;
+        }
+
+        /* Notify that DAR was switched. */
+        if (!dma_construct_send_event(channel_info->event_index, &op_buf)) {
+            return false;
+        }
+
+        /* Loop back to the start, which will set dst_addr. */
+        dma_loop_t loop_config = { .nf = 0, .jump = op_buf.off - op_buf_start };
+        ret = dma_construct_loopend(&loop_config, &op_buf);
     }
 
-    ret = dma_construct_end(&op_buf);
     if (!ret) {
         return ret;
     }
