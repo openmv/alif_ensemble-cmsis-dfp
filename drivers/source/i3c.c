@@ -941,6 +941,53 @@ void i3c_master_rx_blocking(I3C_Type *i3c, i3c_xfer_t *xfer)
 }
 
 /**
+  \fn           void i3c_master_tx(I3C_Type *i3c, i3c_xfer_t *xfer)
+  \brief        Queue master data transmission, without waiting for completion.
+  \param[in]    i3c      : Pointer to i3c register set structure
+  \param[in]    xfer     : Pointer to i3c transfer structure
+  \return       none
+*/
+void i3c_master_tx(I3C_Type *i3c, i3c_xfer_t *xfer)
+{
+    xfer->xfer_cmd.cmd_id   = 0U;
+    xfer->xfer_cmd.port_id  = I3C_MST_TX_TID;
+    xfer->xfer_cmd.cmd_type = I3C_XFER_TYPE_TX_DATA;
+
+    /* Write data to tx port */
+    if (xfer->tx_buf) {
+        i3c_send(i3c, xfer, xfer->tx_len);
+    }
+
+    /* Set response threshold to 1 */
+    i3c->I3C_QUEUE_THLD_CTRL = (i3c->I3C_QUEUE_THLD_CTRL & ~I3C_QUEUE_THLD_CTRL_RESP_BUF_THLD_Msk) |
+                               I3C_QUEUE_THLD_CTRL_RESP_BUF_THLD(1);
+
+    /* Dispatch commands to i3c Command Queue */
+    i3c_dispatch_xfer_cmd(i3c, xfer);
+}
+
+/**
+  \fn           void i3c_master_rx(I3C_Type *i3c, i3c_xfer_t *xfer)
+  \brief        Queue master data reception, without waiting for completion.
+  \param[in]    i3c      : Pointer to i3c register set structure
+  \param[in]    xfer     : Pointer to i3c transfer structure
+  \return       none
+*/
+void i3c_master_rx(I3C_Type *i3c, i3c_xfer_t *xfer)
+{
+    xfer->xfer_cmd.cmd_id   = 0U;
+    xfer->xfer_cmd.port_id  = I3C_MST_RX_TID;
+    xfer->xfer_cmd.cmd_type = I3C_XFER_TYPE_RX_DATA;
+
+    /* Set response threshold to 1 */
+    i3c->I3C_QUEUE_THLD_CTRL = (i3c->I3C_QUEUE_THLD_CTRL & ~I3C_QUEUE_THLD_CTRL_RESP_BUF_THLD_Msk) |
+                               I3C_QUEUE_THLD_CTRL_RESP_BUF_THLD(1);
+
+    /* Dispatch commands to i3c Command Queue */
+    i3c_dispatch_xfer_cmd(i3c, xfer);
+}
+
+/**
   \fn           void i3c_slave_tx_blocking(I3C_Type *i3c,
                                            i3c_xfer_t *xfer)
   \brief        Performs slave data transmission in blocking mode.
