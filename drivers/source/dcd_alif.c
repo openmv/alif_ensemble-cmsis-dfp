@@ -656,6 +656,16 @@ static void _dcd_handle_devt(uint8_t evt, uint16_t info)
             udev->depcmd[1].par1 = (1 << 25) | (1 << 10) | (1 << 8);
             udev->depcmd[1].par0 = (2 << 30) | (0 << 22) | (0 << 17) | (64 << 3) | (0 << 1);
             _dcd_cmd_wait(1, CMDTYP_DEPCFG, 0);
+
+            // The host can reset the bus during a control transfer, before the status stage
+            // that arms the next SETUP (e.g. after the first GET_DESCRIPTOR), so arm it here
+            // if it isn't armed already.
+            RTSS_InvalidateDCache_by_Addr(_xfer_trb[0], sizeof(_xfer_trb[0]));
+            if (!(_xfer_trb[0][3] & 1)) { // HWO
+                _ctrl_long_data = false;
+                _sts_stage = 0;
+                _dcd_start_xfer(TUSB_DIR_OUT, _ctrl_buf, 8, TRBCTL_CTL_SETUP);
+            }
         } break;
         case DEVT_ULSTCHNG: {
             LOG("Link status change");
