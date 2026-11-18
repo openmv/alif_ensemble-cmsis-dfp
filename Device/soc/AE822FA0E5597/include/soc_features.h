@@ -128,6 +128,7 @@
 #define SOC_FEAT_I3C_CORE_CLK_AXI                  (0)
 
 #define SOC_FEAT_I2C_HAS_RESTART_CAP               (1)
+#define SOC_FEAT_I2C_HAS_CLK_ENABLE                (1)
 
 #define SOC_FEAT_CPI_HAS_CROPPING                  (1)
 #define SOC_FEAT_HAS_ISP                           (1)

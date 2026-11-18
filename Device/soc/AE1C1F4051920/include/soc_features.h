@@ -104,6 +104,7 @@
 #define SOC_FEAT_DAC_REG_ALIASING                  (0)
 
 #define SOC_FEAT_I2C_HAS_RESTART_CAP               (0)
+#define SOC_FEAT_I2C_HAS_CLK_ENABLE                (1)
 
 #define SOC_FEAT_CPI_HAS_CROPPING                  (0)
 #define SOC_FEAT_HAS_ISP                           (0)

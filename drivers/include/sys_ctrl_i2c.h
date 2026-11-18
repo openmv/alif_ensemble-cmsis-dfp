@@ -26,6 +26,7 @@
 #include "sys_clocks.h"
 
 #define HE_CLK_ENA_I2C_CKEN (1 << 13) /* Clock enable bit for LPI2C1 */
+#define I2C_CTRL_CKEN       (1 << 0)  /* Clock enable bit for I2C0-3 */
 
 /**
  * enum I2C_INSTANCE
@@ -50,6 +51,11 @@ static inline void enable_i2c_clock(const I2C_INSTANCE inst)
     if (inst == I2C_INSTANCE_LP_1) {
         M55HE_CFG->HE_CLK_ENA |= HE_CLK_ENA_I2C_CKEN;
     }
+#if SOC_FEAT_I2C_HAS_CLK_ENABLE
+    else {
+        (&CLKCTL_PER_SLV->I2C0_CTRL)[inst] |= I2C_CTRL_CKEN;
+    }
+#endif
 }
 
 /**
@@ -63,6 +69,11 @@ static inline void disable_i2c_clock(const I2C_INSTANCE inst)
     if (inst == I2C_INSTANCE_LP_1) {
         M55HE_CFG->HE_CLK_ENA &= ~HE_CLK_ENA_I2C_CKEN;
     }
+#if SOC_FEAT_I2C_HAS_CLK_ENABLE
+    else {
+        (&CLKCTL_PER_SLV->I2C0_CTRL)[inst] &= ~I2C_CTRL_CKEN;
+    }
+#endif
 }
 
 /**
